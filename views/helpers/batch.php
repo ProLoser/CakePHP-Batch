@@ -86,9 +86,8 @@ class BatchHelper extends Helper {
 	 *
 	 * Pass null values in the fields array to generate empty header cells
 	 * Pass true to force the filter/reset buttons to appear somewhere other than the end
-	 * Example: $this->Batch->filter('MyModel', array(null, 'name', 'date' => array('minYear' => 2000)))
+	 * Example: $this->Batch->filter(array(null, 'name', 'date' => array('minYear' => 2000)))
 	 *
-	 * @param string $model 
 	 * @param string $fields 
 	 * @return void
 	 * @author Dean
@@ -130,9 +129,8 @@ class BatchHelper extends Helper {
 	 *
 	 * Pass null values in the fields array to generate empty header cells
 	 * Pass true to force the filter/reset buttons to appear somewhere other than the end
-	 * Example: $this->Batch->filter('MyModel', array(null, 'name', 'date' => array('minYear' => 2000)))
+	 * Example: $this->Batch->filter(array(null, 'name', 'date' => array('minYear' => 2000)))
 	 *
-	 * @param string $model 
 	 * @param string $fields 
 	 * @return void
 	 * @author Dean

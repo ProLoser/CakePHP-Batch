@@ -116,7 +116,7 @@ h4. Option 1a: Helper
 
 Use the helper In between the row with all the column headers and the first row of data add:
 
-@<?php echo $this->Batch->filter('Post', array('name')) ?>@
+@<?php echo $this->Batch->filter(array('name')) ?>@
 
 The first parameter is the model name. The second parameter is an array of fields. If you don't want to filter a particular field pass null in that spot.
 
