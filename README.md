@@ -29,7 +29,6 @@ h2. Usage
 # Use something like the following in your index
 
 <pre><code>function index() {
-	$this->paginate = $this->Batch->paginate;
 	$posts = $this->paginate();
 	$this->set(compact('posts'));
 }</code></pre>
@@ -57,7 +56,6 @@ class PostsController extends AppController {
 	var $components = array('Batch.Batch');
 
 	function index() {
-		$this->paginate = $this->Batch->paginate;
 		$filterOptions = $this->Batch->filterOptions;
 		$posts = $this->paginate();
 		$this->set(compact('filterOptions', 'posts'));
