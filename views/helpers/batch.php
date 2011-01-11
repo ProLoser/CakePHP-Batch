@@ -13,6 +13,13 @@ class BatchHelper extends Helper {
 	
 	function create($model, $params = array()) {
 		$this->model = $model;
+		$params = array_merge(array(
+			'inputDefaults' => array(
+				'empty' => true,
+				'div' => false,
+				'label' => false,
+			),
+		), $params);
 		return $this->Form->create($model, $params);
 	}
 
@@ -110,7 +117,7 @@ class BatchHelper extends Helper {
 					$output .= '</th>';
 				} else {
 					$options['group'] = 'Filter';
-					$output .= '<th>' . $this->_input($field, $options, array('label' => false, 'div' => false)) . '</th>';
+					$output .= '<th>' . $this->_input($field, $options) . '</th>';
 				}
 			}
 		}
@@ -153,7 +160,7 @@ class BatchHelper extends Helper {
 					$output .= '</th>';
 				} else {
 					$options['group'] = 'Batch';
-					$output .= '<th>' . $this->_input($field, $options, array('label' => false, 'div' => false)) . '</th>';
+					$output .= '<th>' . $this->_input($field, $options) . '</th>';
 				}
 			}
 		}
@@ -192,24 +199,38 @@ class BatchHelper extends Helper {
 		} else {
 			$model = $this->model;
 		}
-		$cakeVersion = substr(Configure::read('Cake.version'), 0, 3);
-		if ($cakeVersion === '1.2') {
-			if (
-				isset($this->Form->fieldset['fields']["{$model}.{$field}"]['type'])
-				&& $this->Form->fieldset['fields']["{$model}.{$field}"]['type'] = 'text'
-			) {
+		switch ($this->_fieldType($model, $field)) {
+			case 'text':			
 				$options += array('type' => 'text');
-			}
-		} else if ($cakeVersion === '1.3') {
-			if (
-				isset($this->Form->fieldset[$model]['fields'][$field]['type'])
-				&& $this->Form->fieldset[$model]['fields'][$field]['type'] == 'text'
-			) {
-				$options += array('type' => 'text');
-			}
+			break;
+			case 'boolean':
+				$options += array('options' => array(true => __('Yes', true), false => __('No', true)));
+				if (!isset($defaults['empty'])) {
+					$defaults['empty'] = true;
+				}
+			break;
 		}
 		$output = $this->Form->input($options['group'] . '.' . $model . '.' . $field, array_merge($defaults, $options));
 		return $output;
+	}
+	
+	/**
+	 * Returns the field datatype based on the model schema
+	 *
+	 * @param string $model 
+	 * @param string $field 
+	 * @return string $type
+	 * @author Dean
+	 */
+	protected function _fieldType($model, $field) {
+		$cakeVersion = substr(Configure::read('Cake.version'), 0, 3);
+		$type = null;
+		if ($cakeVersion === '1.2' && isset($this->Form->fieldset['fields']["{$model}.{$field}"]['type'])) {
+			$type = $this->Form->fieldset['fields']["{$model}.{$field}"]['type'];
+		} else if ($cakeVersion === '1.3' && isset($this->Form->fieldset[$model]['fields'][$field]['type'])) {
+			$type = $this->Form->fieldset[$model]['fields'][$field]['type'];
+		}
+		return $type;
 	}
 
 }
