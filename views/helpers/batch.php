@@ -11,15 +11,13 @@ class BatchHelper extends Helper {
 	var $helpers = array('Form');
 	var $model = '';
 	
-	function create($model, $params = array()) {
+	function create($model, $params = array(), $inputDefaults = array()) {
 		$this->model = $model;
-		$params = array_merge(array(
-			'inputDefaults' => array(
-				'empty' => true,
-				'div' => false,
-				'label' => false,
-			),
-		), $params);
+		$params['inputDefaults'] = array_merge(array(
+			'empty' => __(' -- ', true),
+			'div' => false,
+			'label' => false,
+		), $inputDefaults);
 		return $this->Form->create($model, $params);
 	}
 
@@ -205,9 +203,6 @@ class BatchHelper extends Helper {
 			break;
 			case 'boolean':
 				$options += array('options' => array(true => __('Yes', true), false => __('No', true)));
-				if (!isset($defaults['empty'])) {
-					$defaults['empty'] = true;
-				}
 			break;
 		}
 		$output = $this->Form->input($options['group'] . '.' . $model . '.' . $field, array_merge($defaults, $options));
