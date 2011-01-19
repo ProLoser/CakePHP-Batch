@@ -40,7 +40,6 @@ class PostsController extends AppController {
 	var $components = array('Batch.Batch');
 
 	function index() {
-		$this->paginate = $this->Batch->paginate;
 		$posts = $this->paginate();
 		$this->set(compact('posts'));
 	}
@@ -58,7 +57,8 @@ class PostsController extends AppController {
 	function index() {
 		$filterOptions = $this->Batch->filterOptions;
 		$posts = $this->paginate();
-		$this->set(compact('filterOptions', 'posts'));
+		$users = $this->Post->User->find('list');
+		$this->set(compact('filterOptions', 'posts', 'users'));
 	}
 }
 ?></code></pre>
@@ -84,9 +84,9 @@ class PostsController extends AppController {
 	var $paginate = array('contain' => array('Comment'), 'limit' => 5);
 
 	function index() {
-		$this->paginate = $this->Batch->paginate;
 		$posts = $this->paginate();
-		$this->set(compact('posts'));
+		$users = $this->Post->User->find('list');
+		$this->set(compact('posts', 'users'));
 	}
 }
 ?></code></pre>
@@ -101,60 +101,54 @@ class PostsController extends AppController {
 	var $components = array('Batch.Batch'); // Defaults to index action only with no prefix
 
 	function index() {
-		$this->paginate = array_merge($this->Batch->paginate,
-			array('contain' => array('Comment'), 'limit' => 5)
-		);
+		$this->paginate['contain'] = array('Comment');
+		$this->paginate['limit'] = 5;
 		$posts = $this->paginate();
-		$this->set(compact('posts'));
+		$users = $this->Post->User->find('list');
+		$this->set(compact('posts', 'users'));
 	}
 }
 ?></code></pre>
 
-h3. Setting up search forms
+h3. Setting up the forms
 
-h4. Option 1a: Helper
-
-Use the helper In between the row with all the column headers and the first row of data add:
-
-@<?php echo $this->Batch->filter(array('name')) ?>@
-
-The first parameter is the model name. The second parameter is an array of fields. If you don't want to filter a particular field pass null in that spot.
-
-h4. Option 1b: Helper
-
-Use the helper to generate a search form:
-
-@<?php echo $this->Batch->form('Post', array('name')) ?>@
-
-h4. Option 2: Manually
-
-Create your own form however you want. Below is such an example.
-
-<pre><code><?php echo $this->Form->create('Post', array('action' => 'index', 'id' => 'filters')); ?>
-	<table cellpadding="0" cellspacing="0">
-		<thead>
-			<tr>
-				<th><?php echo $this->Paginator->sort('Post.name'); ?></th>
-				<th class="actions">Actions</th>
-			</tr>
-			<tr>
-				<th><?php echo $this->Form->input('Post.name'); ?></th>
-				<th>
-					<button type="submit" name="data[filter]" value="filter">Filter</button>
-					<button type="submit" name="data[reset]" value="reset">Reset</button>
-				</th>
-			</tr>
-		</thead>
-		<tbody>
-			// loop through and display your data
-		</tbody>
-	</table>
-<?php echo $this->Form->end(); ?>
-<div class="paging">
-	<?php echo $this->Paginator->prev('<< '.__('previous', true), array(), null, array('class' => 'disabled')); ?>
-	<?php echo $this->Paginator->numbers(); ?>
-	<?php echo $this->Paginator->next(__('next', true).' >>', array(), null, array('class' =>' disabled')); ?>
-</div></code></pre>
+<pre><code><?php echo $this->Batch->create('Post')?>	
+<table cellpadding="0" cellspacing="0">
+<tr>
+	<th><?php echo $this->Paginator->sort('subject');?></th>
+	<th><?php echo $this->Paginator->sort('body');?></th>
+	<th><?php echo $this->Paginator->sort('user_id');?></th>
+	<th><?php echo $this->Paginator->sort('published');?></th>
+	<th class="actions"><?php __('Actions');?></th>
+</tr>
+<?php 
+echo $this->Batch->filter(array('subject', 'body', 'user_id', 'published'));
+$i = 0;
+foreach ($posts as $post):
+	$class = null;
+	if ($i++ % 2 == 0) {
+		$class = ' class="altrow"';
+	}
+?>
+<tr<?php echo $class;?>>
+	<td><?php echo $post['Post']['subject']; ?>&nbsp;</td>
+	<td><?php echo $post['Post']['body']; ?>&nbsp;</td>
+	<td><?php echo $post['Post']['user_id']; ?>&nbsp;</td>
+	<td><?php echo $post['Post']['published']; ?>&nbsp;</td>
+	<td class="actions">
+		<?php echo $this->Html->link(__('View', true), array('action' => 'view', $post['Post']['id']), array('class' => 'view')); ?>
+		<?php echo $this->Html->link(__('Edit', true), array('action' => 'edit', $post['Post']['id']), array('class' => 'edit')); ?>
+		<?php echo $this->Html->link(__('Delete', true), array('action' => 'delete', $post['Post']['id']), array('class' => 'delete'), sprintf(__('Are you sure you want to delete # %s?', true), $post['Post']['id'])); ?>
+		<?php echo $this->Batch->checkbox($post['Post']['id']); ?>
+	</td>
+</tr>
+<?php 
+endforeach;
+echo $this->Batch->batch(array(null, null, 'user_id', 'published')); 
+?>
+</table>
+<?php echo $this->Batch->end()?>
+</code></pre>
 
 h3. Initialization Tips
 
