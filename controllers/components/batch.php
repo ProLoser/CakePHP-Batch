@@ -172,11 +172,11 @@ class BatchComponent extends Object {
 	function _processBatch() {
 		if (isset($this->_data['Batch']) && isset($this->_data['BatchRecords'])) {
 			$rows = $this->_data['BatchRecords'];
-			if (!$rows && (isset($this->_data['delete']) || isset($this->_data['update']))) {
+			if (!$rows && (isset($this->_data['Batch']['delete']) || isset($this->_data['Batch']['update']))) {
 				$this->controller->Session->setFlash(__('No rows selected', true));
-			} elseif (isset($this->_data['delete'])) {
+			} elseif (isset($this->_data['Batch']['delete'])) {
 				$this->_batchDelete($rows);
-			} elseif (isset($this->_data['update'])) {
+			} elseif (isset($this->_data['Batch']['update'])) {
 				$this->_batchUpdate($rows);
 			}
 			unset($this->controller->data['Batch']);
@@ -220,10 +220,10 @@ class BatchComponent extends Object {
 		$this->_prepareFilter($controller);
 
 		// Set default filter values
-		$this->_data = array_merge($this->settings['defaults'], $this->_data);
+		$this->_data['Filter'] = array_merge($this->settings['defaults'], $this->_data['Filter']);
 		$redirectData = array();
 
-		if (isset($this->_data['Filter'])) {
+		if (isset($this->_data['Filter']['filter'])) {
 			foreach ($this->_data['Filter'] as $model => $fields) {
 				$modelFieldNames = array();
 				if (isset($controller->{$model})) {
@@ -253,14 +253,14 @@ class BatchComponent extends Object {
 					}
 				}
 				// Save model data for redirect
-				if ($this->settings['redirect'] && is_array($this->_data[$model])) {
-					foreach ($this->_data[$model] as $key => $val) {
+				if ($this->settings['redirect'] && is_array($this->_data['Filter'][$model])) {
+					foreach ($this->_data['Filter'][$model] as $key => $val) {
 						$redirectData["$model.$key"] = $val;
 					}
 				}
 				// Unset empty model data
 				if (count($fields) == 0) {
-					unset($this->_data[$model]);
+					unset($this->_data['Filter'][$model]);
 				}
 			}
 		}
@@ -362,11 +362,11 @@ class BatchComponent extends Object {
 	function _prepareFilter(&$controller) {
 		if (isset($controller->data)) {
 			$this->_data = $controller->data;
-			foreach ($this->_data as $model => $fields) {
+			foreach ($this->_data['Filter'] as $model => $fields) {
 				if (is_array($fields)) {
 					foreach ($fields as $key => $field) {
 						if ($field == '') {
-							unset($this->_data[$model][$key]);
+							unset($this->_data['Filter'][$model][$key]);
 						}
 					}
 				}
@@ -374,11 +374,10 @@ class BatchComponent extends Object {
 
 			App::import('Sanitize');
 			$sanitize = new Sanitize();
-			$this->_data = $sanitize->clean($this->_data, array('encode' => false));
+			$this->_data['Filter'] = $sanitize->clean($this->_data['Filter'], array('encode' => false));
 		}
-
-		if (empty($this->_data)) {
-			$this->_data = $this->_checkParams($controller);
+		if (empty($this->_data['Filter'])) {
+			$this->_data['Filter'] = $this->_checkParams($controller);
 		}
 	}
 
@@ -415,8 +414,13 @@ class BatchComponent extends Object {
 				}
 			}
 		}
-
-		return (!empty($filter)) ? $filter : array();
+		
+		if (!empty($filter)) {
+			$filter['filter'] = true;
+			return $filter;
+		} else {
+			return array();
+		}
 	}
 
 /**

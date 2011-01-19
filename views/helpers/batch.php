@@ -110,8 +110,8 @@ class BatchHelper extends Helper {
 					$output .= '<th>&nbsp;</th>';
 				} elseif ($field === true) {
 					$output .= '<th class="actions">';
-					$output .= $this->Form->submit(__('Filter', true), array('div' => false, 'name' => 'data[filter]'));
-					$output .= $this->Form->submit(__('Reset', true), array('div' => false, 'name' => 'data[reset]'));
+					$output .= $this->Form->submit(__('Filter', true), array('div' => false, 'name' => 'data[Filter][filter]'));
+					$output .= $this->Form->submit(__('Reset', true), array('div' => false, 'name' => 'data[Filter][reset]'));
 					$output .= '</th>';
 				} else {
 					$options['group'] = 'Filter';
@@ -121,8 +121,8 @@ class BatchHelper extends Helper {
 		}
 		if (!in_array(true, $fields, true)) {
 			$output .= '<th class="actions">';
-			$output .= $this->Form->submit(__('Filter', true), array('div' => false, 'name' => 'data[filter]'));
-			$output .= $this->Form->submit(__('Reset', true), array('div' => false, 'name' => 'data[reset]'));
+			$output .= $this->Form->submit(__('Filter', true), array('div' => false, 'name' => 'data[Filter][filter]'));
+			$output .= $this->Form->submit(__('Reset', true), array('div' => false, 'name' => 'data[Filter][reset]'));
 			$output .= '</th>';
 		}
 		$output .= '</tr>';
@@ -153,8 +153,8 @@ class BatchHelper extends Helper {
 					$output .= '<th>&nbsp;</th>';
 				} elseif ($field === true) {
 					$output .= '<th class="actions">';
-					$output .= $this->Form->submit(__('Update', true), array('div' => false, 'name' => 'data[update]'));
-					$output .= $this->Form->submit(__('Delete', true), array('div' => false, 'name' => 'data[delete]'));
+					$output .= $this->Form->submit(__('Update', true), array('div' => false, 'name' => 'data[Batch][update]'));
+					$output .= $this->Form->submit(__('Delete', true), array('div' => false, 'name' => 'data[Batch][delete]'));
 					$output .= '</th>';
 				} else {
 					$options['group'] = 'Batch';
@@ -164,8 +164,8 @@ class BatchHelper extends Helper {
 		}
 		if (!in_array(true, $fields, true)) {
 			$output .= '<th class="actions">';
-			$output .= $this->Form->submit(__('Update', true), array('div' => false, 'name' => 'data[update]'));
-			$output .= $this->Form->submit(__('Delete', true), array('div' => false, 'name' => 'data[delete]', 'onclick' => "return confirm('Are you sure you want to delete the selected records?');"));
+			$output .= $this->Form->submit(__('Update', true), array('div' => false, 'name' => 'data[Batch][update]'));
+			$output .= $this->Form->submit(__('Delete', true), array('div' => false, 'name' => 'data[Batch][delete]', 'onclick' => "return confirm('Are you sure you want to delete the selected records?');"));
 			$output .= '</th>';
 		}
 		$output .= '</tr>';
