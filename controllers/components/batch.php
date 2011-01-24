@@ -177,6 +177,7 @@ class BatchComponent extends Object {
 			} elseif (isset($this->_data['Batch']['delete'])) {
 				$this->_batchDelete($rows);
 			} elseif (isset($this->_data['Batch']['update'])) {
+				unset($this->_data['Batch']['update']);
 				$this->_batchUpdate($rows);
 			}
 			unset($this->controller->data['Batch']);
