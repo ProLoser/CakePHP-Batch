@@ -360,7 +360,7 @@ class BatchComponent extends Object {
  * @access private
  */
 	function _prepareFilter(&$controller) {
-		if (isset($controller->data)) {
+		if (isset($controller->data['Filter'])) {
 			$this->_data = $controller->data;
 			foreach ($this->_data['Filter'] as $model => $fields) {
 				if (is_array($fields)) {
