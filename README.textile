@@ -1,26 +1,20 @@
-h1. CakePHP Filter Plugin
+h1. CakePHP Batch (and filter) Plugin
 
-Paginates Filtered Records
+Paginates Filtered Records and allows Batch deletion and updating of records
 
 h2. Background
 
-This plugin is a fork of "Jose Diaz-Gonzalez's Filter component":http://github.com/josegonzalez/cakephp-filter-component, which is something of a fork of "James Fairhurst's Filter Component":http://www.jamesfairhurst.co.uk/posts/view/cakephp_filter_component/, which is in turn a fork by "Maciej Grajcarek":http://blog.uplevel.pl/index.php/2008/06/cakephp-12-filter-component/, which is ITSELF a fork from "Nik Chankov's code":http://nik.chankov.net/2008/03/01/filtering-component-for-your-tables/. "Chad Jablonski":http://github.com/cjab/cakephp-filter-plugin then added RANGE support with a few bug fixes. "jmroth":http://github.com/jmroth/cakephp-filter-plugin pointed out a pretty bad redirect issue and "fixed it". Then "Jose Diaz-Gonzalez":http://josediazgonzalez.com/ took everyone's changes, merged them together, and updated the Component to be a bit more 1.3 compliant.
+The Batch plugin is an extension of "Jose Diaz-Gonzalez's Filter plugin":http://github.com/josegonzalez/cakephp-filter-component, which is something of a fork of "James Fairhurst's Filter Component":http://www.jamesfairhurst.co.uk/posts/view/cakephp_filter_component/, which is in turn a fork by "Maciej Grajcarek":http://blog.uplevel.pl/index.php/2008/06/cakephp-12-filter-component/, which is ITSELF a fork from "Nik Chankov's code":http://nik.chankov.net/2008/03/01/filtering-component-for-your-tables/. "Chad Jablonski":http://github.com/cjab/cakephp-filter-plugin then added RANGE support with a few bug fixes. "jmroth":http://github.com/jmroth/cakephp-filter-plugin pointed out a pretty bad redirect issue and "fixed it". This also contains a view helper made by "Matt Curry":http://github.com/mcurry/cakephp-filter-component.
 
-That's a lot of forks...
-
-This also contains a view helper made by "Matt Curry":http://github.com/mcurry/cakephp-filter-component.
-
-This also uses a behavior adapted from work by "Brenton":http://bakery.cakephp.org/articles/view/habtm-searching to allow for HasAndBelongsToMany and HasMany relationships.
-
-This works for all relationships.
+<del>This also uses a behavior adapted from work by "Brenton":http://bakery.cakephp.org/articles/view/habtm-searching to allow for HasAndBelongsToMany and HasMany relationships.</del> Disabled for now as the behavior isn't working.
 
 h2. Installation
 
 # Clone from github : in your plugin directory type
-	@git clone  git://github.com/josegonzalez/cakephp-filter-plugin.git filter@
+	@git clone git://github.com/ProLoser/CakePHP-Batch.git batch@
 # Add as a git submodule : from your app/ directory type
-	@git submodule add git://github.com/josegonzalez/cakephp-filter-plugin.git plugins/filter@
-# Download an archive from github and extract the contents into @/plugins/filter@
+	@git submodule add git://github.com/ProLoser/CakePHP-Batch.git plugins/batch@
+# Download an archive from github and extract the contents into @/plugins/batch@
 
 h2. Usage
 
