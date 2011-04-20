@@ -13,6 +13,8 @@ class BatchHelper extends Helper {
 	
 	function create($model, $params = array(), $inputDefaults = array()) {
 		$this->model = $model;
+		if (!isset($params['class']))
+			$params['class'] = 'batch';
 		$params['inputDefaults'] = array_merge(array(
 			'empty' => __(' -- ', true),
 			'div' => false,
@@ -175,7 +177,7 @@ class BatchHelper extends Helper {
 	
 	function checkbox($recordId) {
 		$field = 'BatchRecords.' . $recordId;
-		$params = array('value' => $recordId, 'hiddenField' => false);
+		$params = array('value' => $recordId, 'hiddenField' => false, 'class' => 'batch');
 		return $this->Form->checkbox($field, $params);
 	}
 	
