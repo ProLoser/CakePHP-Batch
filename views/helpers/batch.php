@@ -10,11 +10,23 @@
 class BatchHelper extends Helper {
 	var $helpers = array('Form');
 	var $model = '';
-	
+
+/**
+ * Starts a new form with modifications necessary for the batch plugin. 
+ * Supports both filter and batch functions so that it can wrap an entire table.
+ *
+ * @param string $model 
+ * @param string $params 
+ * @param string $inputDefaults 
+ * @return void
+ * @author Dean Sofer
+ */
 	function create($model, $params = array(), $inputDefaults = array()) {
 		$this->model = $model;
 		if (!isset($params['class']))
 			$params['class'] = 'batch';
+		$params['url'] = '/' . $this->params['url']['url'];
+		
 		$params['inputDefaults'] = array_merge(array(
 			'empty' => __(' -- ', true),
 			'div' => false,
@@ -23,6 +35,12 @@ class BatchHelper extends Helper {
 		return $this->Form->create($model, $params);
 	}
 
+/**
+ * Simply closes the form. Additional functionality (if necessar) may be added later
+ *
+ * @return void
+ * @author Dean Sofer
+ */
 	function end() {
 		return $this->Form->end();
 	}

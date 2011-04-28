@@ -1,3 +1,6 @@
-form.batch table tr:hover {
+form.batch tr:hover, form.batch tr.checked:hover {
 	background-color: #ffc;	
+}
+form.batch tr.checked {
+	background-color: #ffd;
 }

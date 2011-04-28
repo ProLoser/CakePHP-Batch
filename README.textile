@@ -12,40 +12,31 @@ h2. Installation
 
 h3. Download
 
-# Clone from github : in your plugin directory type
-	@git clone git://github.com/ProLoser/CakePHP-Batch.git batch@
-# Add as a git submodule : from your app/ directory type
-	@git submodule add git://github.com/ProLoser/CakePHP-Batch.git plugins/batch@
-# Download an archive from github and extract the contents into @/plugins/batch@
+* Clone/Submodule/Download from github into @/plugins/batch@
 
 h3. Include Component
 
-# Include the component in your controller (AppController or otherwise)
+Include the component in your controller (AppController or otherwise)
 	@var $components = array('Batch.Batch');@
+	
+*Note:* _The plugin by default only works with the 'index' action. If you want it to support more actions (such as 'admin_index') you must pass the option (see below)_
 
-h3. Setting up the forms
+h3. Setup the form
 
 <pre><code><?php echo $this->Batch->create('Post')?>	
 <table cellpadding="0" cellspacing="0">
 <tr>
 	<th><?php echo $this->Paginator->sort('subject');?></th>
-	<th><?php echo $this->Paginator->sort('body');?></th>
 	<th><?php echo $this->Paginator->sort('user_id');?></th>
 	<th><?php echo $this->Paginator->sort('published');?></th>
 	<th class="actions"><?php __('Actions');?></th>
 </tr>
 <?php 
-echo $this->Batch->filter(array('subject', 'body', 'user_id', 'published'));
-$i = 0;
+echo $this->Batch->filter(array('subject', 'user_id', 'published'));
 foreach ($posts as $post):
-	$class = null;
-	if ($i++ % 2 == 0) {
-		$class = ' class="altrow"';
-	}
 ?>
-<tr<?php echo $class;?>>
+<tr>
 	<td><?php echo $post['Post']['subject']; ?>&nbsp;</td>
-	<td><?php echo $post['Post']['body']; ?>&nbsp;</td>
 	<td><?php echo $post['Post']['user_id']; ?>&nbsp;</td>
 	<td><?php echo $post['Post']['published']; ?>&nbsp;</td>
 	<td class="actions">
@@ -57,74 +48,20 @@ foreach ($posts as $post):
 </tr>
 <?php 
 endforeach;
-echo $this->Batch->batch(array(null, null, 'user_id', 'published')); 
+echo $this->Batch->batch(array(null, 'user_id', 'published')); 
 ?>
 </table>
 <?php echo $this->Batch->end()?></code></pre>
 
-h3. Note on 1.2 usage (CURRENTLY BROKEN?)
+h3. Include the CSS / JS (Optional)
 
-In order for this to work in 1.2, you need to have the following in your controller:
-
-<pre><code><?php
-class PostsController extends AppController {
-	var $components = array('Batch.Batch');
-
-	function index() {
-		$filterOptions = $this->Batch->filterOptions;
-		$posts = $this->paginate();
-		$users = $this->Post->User->find('list');
-		$this->set(compact('filterOptions', 'posts', 'users'));
-	}
-}
-?></code></pre>
-
-And then merge the $filterOptions variable on anything pagination uses. It can be set globally using PaginatorHelper::options() as follows (in the view):
-
-@<?php $paginator->options($filterOptions); ?>@
-
+Some nifty functionality is supplied with the assets:
+	@var $this->Html->script('/batch/js/batch')@
+	@var $this->Html->css('/batch/css/batch')@
+	
+The Javascript relies on jquery but the files are small so feel free to customize them how you see fit.
 
 h2. Advanced Usage
-
-
-h3. Overriding the Filter pagination
-
-h4. Option 1: Controller-wide
-
-By setting the @$paginate@ variable for your controller, the Filter component merges those into it's own rules before processing incoming information.
-
-<pre><code><?php
-class PostsController extends AppController {
-	var $name = 'Posts';
-	var $components = array('Batch.Batch');
-	var $paginate = array('contain' => array('Comment'), 'limit' => 5);
-
-	function index() {
-		$posts = $this->paginate();
-		$users = $this->Post->User->find('list');
-		$this->set(compact('posts', 'users'));
-	}
-}
-?></code></pre>
-
-h4. Option 2: Action-specific
-
-You can merge in things to the paginate array before any pagination happens if necessary.
-
-<pre><code><?php
-class PostsController extends AppController {
-	var $name = 'Posts';
-	var $components = array('Batch.Batch'); // Defaults to index action only with no prefix
-
-	function index() {
-		$this->paginate['contain'] = array('Comment');
-		$this->paginate['limit'] = 5;
-		$posts = $this->paginate();
-		$users = $this->Post->User->find('list');
-		$this->set(compact('posts', 'users'));
-	}
-}
-?></code></pre>
 
 h3. Initialization Tips
 
