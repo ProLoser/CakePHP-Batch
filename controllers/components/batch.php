@@ -47,6 +47,7 @@ class BatchComponent extends Object {
 		'whitelist' => array(),
 		'cascade' => true,
 		'callbacks' => false,
+		'security' => false,
 	);
 
 /**
@@ -87,6 +88,15 @@ class BatchComponent extends Object {
 			$this->controller = $controller;
 			$settings['whitelist'] = (empty($settings['whitelist'])) ? array() : (array) $settings['whitelist'];
 			$this->settings = array_merge($this->settings, $settings);
+			
+			// Fix for security component
+			if (isset($this->controller->Security) && $this->settings['security']) {
+				$this->controller->Security->disabledFields[] = 'delete';
+				$this->controller->Security->disabledFields[] = 'update';
+				$this->controller->Security->disabledFields[] = 'filter';
+				$this->controller->Security->disabledFields[] = 'clear';
+				$this->controller->Security->disabledFields[] = 'reset';
+			}
 		}
 	}
 

@@ -91,7 +91,10 @@ class PostsController extends AppController {
 		'separator' => '/',
 		'rangeSeparator' => '-',
 		'url' => array(),
-		'whitelist' => array()
+		'whitelist' => array(),
+		'cascade' => true,
+		'callbacks' => false,
+		'security' => false,
 	));
 }
 ?></code></pre>
@@ -108,6 +111,9 @@ class PostsController extends AppController {
 # rangeSeparator:		Separator to use between dates in a date range
 # url:					Url variable used in paginate helper (syntax is @array('url' => $url)@);
 # whitelist:			Array of fields and models for which this component may filter
+# cascade:				Record deletion cascades
+# callbacks:			Record update/deletion triggers callbacks
+# security:				Adds form buttons to the SecurityComponent::ignoreFields attribute. Resolves conflicts with security component
 
 h2. Todo
 
