@@ -94,7 +94,7 @@ class PostsController extends AppController {
 		'whitelist' => array(),
 		'cascade' => true,
 		'callbacks' => false,
-		'security' => false,
+		'security' => true,
 	));
 }
 ?></code></pre>
@@ -113,7 +113,7 @@ class PostsController extends AppController {
 # whitelist:			Array of fields and models for which this component may filter
 # cascade:				Record deletion cascades
 # callbacks:			Record update/deletion triggers callbacks
-# security:				Adds form buttons to the SecurityComponent::ignoreFields attribute. Resolves conflicts with security component
+# security:				Add form buttons to the SecurityComponent::ignoreFields attribute. Resolves conflicts with security component
 
 h2. Todo
 
