@@ -90,12 +90,14 @@ class BatchComponent extends Object {
 			$this->settings = array_merge($this->settings, $settings);
 			
 			// Fix for security component
-			if (isset($this->controller->Security) && $this->settings['security']) {
-				$this->controller->Security->disabledFields[] = 'delete';
-				$this->controller->Security->disabledFields[] = 'update';
-				$this->controller->Security->disabledFields[] = 'filter';
-				$this->controller->Security->disabledFields[] = 'clear';
-				$this->controller->Security->disabledFields[] = 'reset';
+			if (in_array('Security', array_keys($controller->components)) && $this->settings['security']) {
+				$controller->Security->disabledFields = array_merge($controller->Security->disabledFields, array(
+					'Filter.filter', 
+					'Filter.reset',
+					'Filter.clear', 
+					'Batch.delete', 
+					'Batch.update',
+				));
 			}
 		}
 	}
