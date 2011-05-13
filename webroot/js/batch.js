@@ -9,4 +9,12 @@ $(document).ready(function(){
 			}
 		}
 	});
+	$('form.batch tr input.batch').live('change', function(){
+		$box = $(this);
+		if ($box.is(':checked')) {
+			$box.closest('tr').addClass('checked');
+		} else {
+			$box.closest('tr').removeClass('checked');
+		}
+	});
 });
