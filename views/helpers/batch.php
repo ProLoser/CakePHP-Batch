@@ -192,11 +192,32 @@ class BatchHelper extends Helper {
 		return $output;
 	}
 	
-	
+	/**
+	 * Generates a checkbox used for batch actions for the current row of items
+	 *
+	 * @param string $recordId 
+	 * @return string
+	 * @author Dean Sofer
+	 */
 	function checkbox($recordId) {
 		$field = 'BatchRecords.' . $recordId;
 		$params = array('value' => $recordId, 'hiddenField' => false, 'class' => 'batch');
 		return $this->Form->checkbox($field, $params);
+	}
+	
+	/**
+	 * Generates a checkbox used only for toggling all batch checkboxes at once
+	 *
+	 * @return string
+	 * @author Dean Sofer
+	 */
+	function all($options = array()) {
+		$options = array_merge(array(
+			'value' => '', 
+			'hiddenField' => false, 
+			'class' => 'batch-all'
+		), $options);
+		return $this->Form->checkbox('', $options);
 	}
 	
 	/**

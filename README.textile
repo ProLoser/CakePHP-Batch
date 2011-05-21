@@ -56,7 +56,7 @@ echo $this->Batch->batch(array(null, 'user_id', 'published'));
 h3. Include the CSS / JS (Optional)
 
 Some nifty functionality is supplied with the assets:
-	@var $this->Html->script('/batch/js/batch')@
+	@var $this->Html->script('/batch/js/jquery')@
 	@var $this->Html->css('/batch/css/batch')@
 	
 The Javascript relies on jquery but the files are small so feel free to customize them how you see fit.
