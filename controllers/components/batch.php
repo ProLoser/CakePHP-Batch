@@ -126,11 +126,7 @@ class BatchComponent extends Object {
 	function _processAction() {
 		$this->paginate = array_merge($this->paginate, $this->controller->paginate);
 		if (isset($this->controller->data['reset']) || isset($this->controller->data['cancel'])) {
-			$redirectUrl = Router::url(array(
-				'controller' => $this->controller->params['controller'],
-				'action' => $this->controller->action,
-			));
-			$this->controller->redirect($redirectUrl);
+			$this->controller->redirect(array());
 		} else {
 			$this->_processFilters($this->controller);
 			$this->_processBatch($this->controller);
