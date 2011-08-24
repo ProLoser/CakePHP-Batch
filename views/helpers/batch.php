@@ -129,9 +129,8 @@ class BatchHelper extends Helper {
 				if (empty($field)) {
 					$output .= '<th>&nbsp;</th>';
 				} elseif ($field === true) {
-					$output .= '<th class="actions">';
-					$output .= $this->Form->submit(__('Filter', true), array('div' => false, 'name' => 'data[Filter][filter]'));
-					$output .= $this->Form->submit(__('Reset', true), array('div' => false, 'name' => 'data[Filter][reset]'));
+					$output = '<th class="actions">';
+					$output .= $this->filterButtons();
 					$output .= '</th>';
 				} else {
 					$options['group'] = 'Filter';
@@ -141,11 +140,22 @@ class BatchHelper extends Helper {
 		}
 		if (!in_array(true, $fields, true)) {
 			$output .= '<th class="actions">';
-			$output .= $this->Form->submit(__('Filter', true), array('div' => false, 'name' => 'data[Filter][filter]'));
-			$output .= $this->Form->submit(__('Reset', true), array('div' => false, 'name' => 'data[Filter][reset]'));
+			$output .= $this->filterButtons();
 			$output .= '</th>';
 		}
 		$output .= '</tr>';
+		return $output;
+	}
+	
+	/**
+	 * Small helper function for filter method
+	 *
+	 * @return string
+	 * @author Dean Sofer
+	 */
+	function filterButtons() {
+		$output = $this->Form->submit(__('Filter', true), array('div' => false, 'name' => 'data[Filter][filter]'));
+		$output .= $this->Form->submit(__('Reset', true), array('div' => false, 'name' => 'data[Filter][reset]'));
 		return $output;
 	}
 
@@ -160,35 +170,53 @@ class BatchHelper extends Helper {
 	 * @return void
 	 * @author Dean
 	 */
-	function batch($fields = array()) {
+	function batch($fields = array(), $options = array()) {
+		$options = array_merge(array(
+		), $options);
+		
 		$output = '<tr class="batch">';
 		
 		if (!empty($fields)) {
-			foreach ($fields as $field => $options) {
+			foreach ($fields as $field => $attributes) {
 				if (is_int($field)) {
-					$field = $options;
-					$options = array();
+					$field = $attributes;
+					$attributes = array();
 				}
 				if (empty($field)) {
 					$output .= '<th>&nbsp;</th>';
 				} elseif ($field === true) {
-					$output .= '<th class="actions">';
-					$output .= $this->Form->submit(__('Update', true), array('div' => false, 'name' => 'data[Batch][update]'));
-					$output .= $this->Form->submit(__('Delete', true), array('div' => false, 'name' => 'data[Batch][delete]'));
+					$output = '<th class="actions">';
+					$output .= $this->batchButtons();
 					$output .= '</th>';
 				} else {
-					$options['group'] = 'Batch';
-					$output .= '<th>' . $this->_input($field, $options) . '</th>';
+					$attributes['group'] = 'Batch';
+					if (!isset($attributes['disabled']))
+						$attributes['disabled'] = true;
+					$output .= '<th>';
+					$output .= $this->Form->checkbox(null, array('name' => null, 'id' => null, 'checked' => !$attributes['disabled'], 'hiddenField' => false));
+					$output .= $this->_input($field, $attributes);
+					$output .= '</th>';
 				}
 			}
 		}
 		if (!in_array(true, $fields, true)) {
 			$output .= '<th class="actions">';
-			$output .= $this->Form->submit(__('Update', true), array('div' => false, 'name' => 'data[Batch][update]'));
-			$output .= $this->Form->submit(__('Delete', true), array('div' => false, 'name' => 'data[Batch][delete]', 'onclick' => "return confirm('Are you sure you want to delete the selected records?');"));
+			$output .= $this->batchButtons();
 			$output .= '</th>';
 		}
 		$output .= '</tr>';
+		return $output;
+	}
+	
+	/**
+	 * Small helper function for batch method
+	 *
+	 * @return string
+	 * @author Dean Sofer
+	 */
+	function batchButtons() {
+		$output = $this->Form->submit(__('Update', true), array('div' => false, 'name' => 'data[Batch][update]', 'onclick' => "return confirm('".__('Are you sure you want to update the selected records?', true)."');"));
+		$output .= $this->Form->submit(__('Delete', true), array('div' => false, 'name' => 'data[Batch][delete]', 'onclick' => "return confirm('".__('Are you sure you want to delete the selected records?', true)."');"));
 		return $output;
 	}
 	

@@ -28,4 +28,13 @@ $(document).ready(function(){
 			$('form.batch input.batch').removeAttr('checked').closest('tr').removeClass('checked');
 		}
 	});
+	$('tr.batch').delegate('input:checkbox', 'change', function() {
+		$this = $(this);
+		$el = $this.next('input, select');
+		if ($el.is(':enabled') && !$this.is(':checked')) {
+			$el.attr('disabled', 'disabled');
+		} else {
+			$el.removeAttr('disabled');
+		}
+	});
 });

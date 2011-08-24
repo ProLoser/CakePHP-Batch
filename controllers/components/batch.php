@@ -482,11 +482,7 @@ class BatchComponent extends Object {
 	function _escapeFields($fields, $model) {
 		$dbo = $this->controller->{$model}->getDataSource();
 		foreach ($fields as $field => $value) {
-			if (!$value && $value !== '0') {
-				unset($fields[$field]);
-			} else {
-				$fields[$field] = $dbo->value($value, $field, false);
-			}
+			$fields[$field] = $dbo->value($value, $field, false);
 		}
 		return $fields;
 	}
