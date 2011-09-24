@@ -90,7 +90,7 @@ class BatchComponent extends Object {
 			$this->settings = array_merge($this->settings, $settings);
 			
 			// Fix for security component
-			if ($this->settings['security'] && in_array('Security', array_keys($controller->components))) {
+			if ($this->settings['security'] && in_array('Security', array_keys($controller->components), true)) {
 				$controller->Security->disabledFields = array_merge($controller->Security->disabledFields, array(
 					'Filter.filter', 
 					'Filter.reset',
