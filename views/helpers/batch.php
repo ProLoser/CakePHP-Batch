@@ -57,12 +57,7 @@ class BatchHelper extends Helper {
 		$output = $this->Form->create($model, array('class' => 'filters'));
 		$this->model = $model;
 		if (!empty($fields)) {
-			$cakeVersion = substr(Configure::read('Cake.version'), 0, 3);
-			if ($cakeVersion === '1.2') {
-				$output .= $this->_form12($fields);
-			} else if ($cakeVersion === '1.3') {
-				$output .= $this->_form13($fields, $blacklist);
-			}
+			$output .= $this->_form($fields, $blacklist);
 		}
 		$output .= $this->Form->submit(__('Filter', true), array('name' => 'data[filter]'));
 		$output .= $this->Form->submit(__('Reset', true), array('name' => 'data[reset]'));
@@ -71,34 +66,14 @@ class BatchHelper extends Helper {
 	}
 
 	/**
-	 * Generates the form for CakePHP 1.2.x
+	 * Generates the form
 	 *
 	 * @param string $model 
 	 * @param string $fields 
 	 * @return void
 	 * @author Dean
 	 */
-	function _form12($fields) {
-		$output = '';
-		foreach ($fields as $field => $options) {
-			if (is_int($field)) {
-				$field = $options;
-				$options = array();
-			}
-			$output .= $this->_input($field, $options);
-		}
-		return $output;
-	}
-
-	/**
-	 * Generates the form for CakePHP 1.3.x
-	 *
-	 * @param string $model 
-	 * @param string $fields 
-	 * @return void
-	 * @author Dean
-	 */
-	function _form13($fields = null, $blacklist = null) {
+	function _form($fields = null, $blacklist = null) {
 		$fields = array_merge($fields, array(
 			'legend' => false,
 			'fieldset' => false,
@@ -287,11 +262,8 @@ class BatchHelper extends Helper {
 	 * @author Dean
 	 */
 	protected function _fieldType($model, $field) {
-		$cakeVersion = substr(Configure::read('Cake.version'), 0, 3);
 		$type = null;
-		if ($cakeVersion === '1.2' && isset($this->Form->fieldset['fields']["{$model}.{$field}"]['type'])) {
-			$type = $this->Form->fieldset['fields']["{$model}.{$field}"]['type'];
-		} else if ($cakeVersion === '1.3' && isset($this->Form->fieldset[$model]['fields'][$field]['type'])) {
+		if (isset($this->Form->fieldset[$model]['fields'][$field]['type'])) {
 			$type = $this->Form->fieldset[$model]['fields'][$field]['type'];
 		}
 		return $type;
