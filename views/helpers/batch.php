@@ -217,6 +217,8 @@ class BatchHelper extends Helper {
 	function all($options = array()) {
 		$options = array_merge(array(
 			'value' => '', 
+			'id' => '',
+			'name' => '',
 			'hiddenField' => false, 
 			'class' => 'batch-all'
 		), $options);
