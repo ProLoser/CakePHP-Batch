@@ -10,6 +10,24 @@
 class BatchHelper extends Helper {
 	var $helpers = array('Form');
 	var $model = '';
+	private $_settings = array();
+	protected $_View = null;
+	/**
+	* Constructor
+	*
+	* Takes options to configure instance variables like publisher
+	*
+	* ### Options
+	*
+	* - `publisher` (string) Publisher key from [ShareThis](http://sharethis.com)
+	*
+	* @param array $options
+	*/
+	public function __construct(View $View, $settings = array()) {
+		parent::__construct($View, $settings);
+		$this->_View = $View;
+		$this->_settings = array_merge($this->_settings, $settings);
+	}
 
 /**
  * Starts a new form with modifications necessary for the batch plugin. 
@@ -25,7 +43,7 @@ class BatchHelper extends Helper {
 		$this->model = $model;
 		if (!isset($params['class']))
 			$params['class'] = 'batch';
-		$params['url'] = '/' . $this->params['url']['url'];
+		$params['url'] = '/' . $this->_View->request->url;
 		
 		$params['inputDefaults'] = array_merge(array(
 			'empty' => __(' -- '),

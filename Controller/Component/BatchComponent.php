@@ -3,7 +3,7 @@
  * Batch component
  *
  */
-class BatchComponent extends Object {
+class BatchComponent extends Component {
 
 /**
  * Default Component::$params
