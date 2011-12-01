@@ -181,7 +181,7 @@ class BatchComponent extends Object {
 		if (isset($this->_data['Batch']) && isset($this->_data['BatchRecords'])) {
 			$rows = $this->_data['BatchRecords'];
 			if (!$rows && (isset($this->_data['Batch']['delete']) || isset($this->_data['Batch']['update']))) {
-				$this->controller->Session->setFlash(__('No rows selected', true));
+				$this->controller->Session->setFlash(__('No rows selected'));
 			} elseif (isset($this->_data['Batch']['delete'])) {
 				$this->_batchDelete($rows);
 			} elseif (isset($this->_data['Batch']['update'])) {
@@ -195,9 +195,9 @@ class BatchComponent extends Object {
 	
 	function _batchDelete($rows) {
 		if ($this->controller->{$this->controller->modelClass}->deleteAll(array($this->controller->modelClass . '.id' => $rows), $this->settings['cascade'], $this->settings['callbacks'])) {
-			$this->controller->Session->setFlash(sprintf(__('%s record(s) successfully deleted', true), count($rows)));
+			$this->controller->Session->setFlash(sprintf(__('%s record(s) successfully deleted'), count($rows)));
 		} else {
-			$this->controller->Session->setFlash(__('There was an error attempting to delete the specified rows', true));
+			$this->controller->Session->setFlash(__('There was an error attempting to delete the specified rows'));
 		}
 	}
 	
@@ -215,7 +215,7 @@ class BatchComponent extends Object {
 				$this->controller->{$this->controller->modelClass}->{$model}->updateAll($fields, array($model . '.' . $foreignId => $rows));
 			}
 		}
-		$this->controller->Session->setFlash(sprintf(__('%s record(s) successfully updated', true), count($rows)));
+		$this->controller->Session->setFlash(sprintf(__('%s record(s) successfully updated'), count($rows)));
 	}
 
 /**

@@ -28,7 +28,7 @@ class BatchHelper extends Helper {
 		$params['url'] = '/' . $this->params['url']['url'];
 		
 		$params['inputDefaults'] = array_merge(array(
-			'empty' => __(' -- ', true),
+			'empty' => __(' -- '),
 			'div' => false,
 			'label' => false,
 		), $inputDefaults);
@@ -59,8 +59,8 @@ class BatchHelper extends Helper {
 		if (!empty($fields)) {
 			$output .= $this->_form($fields, $blacklist);
 		}
-		$output .= $this->Form->submit(__('Filter', true), array('name' => 'data[filter]'));
-		$output .= $this->Form->submit(__('Reset', true), array('name' => 'data[reset]'));
+		$output .= $this->Form->submit(__('Filter'), array('name' => 'data[filter]'));
+		$output .= $this->Form->submit(__('Reset'), array('name' => 'data[reset]'));
 		$output .= $this->Form->end();
 		return $output;
 	}
@@ -129,8 +129,8 @@ class BatchHelper extends Helper {
 	 * @author Dean Sofer
 	 */
 	function filterButtons() {
-		$output = $this->Form->submit(__('Filter', true), array('div' => false, 'name' => 'data[Filter][filter]'));
-		$output .= $this->Form->submit(__('Reset', true), array('div' => false, 'name' => 'data[Filter][reset]'));
+		$output = $this->Form->submit(__('Filter'), array('div' => false, 'name' => 'data[Filter][filter]'));
+		$output .= $this->Form->submit(__('Reset'), array('div' => false, 'name' => 'data[Filter][reset]'));
 		return $output;
 	}
 
@@ -190,8 +190,8 @@ class BatchHelper extends Helper {
 	 * @author Dean Sofer
 	 */
 	function batchButtons() {
-		$output = $this->Form->submit(__('Update', true), array('div' => false, 'name' => 'data[Batch][update]', 'onclick' => "return confirm('".__('Are you sure you want to update the selected records?', true)."');"));
-		$output .= $this->Form->submit(__('Delete', true), array('div' => false, 'name' => 'data[Batch][delete]', 'onclick' => "return confirm('".__('Are you sure you want to delete the selected records?', true)."');"));
+		$output = $this->Form->submit(__('Update'), array('div' => false, 'name' => 'data[Batch][update]', 'onclick' => "return confirm('".__('Are you sure you want to update the selected records?')."');"));
+		$output .= $this->Form->submit(__('Delete'), array('div' => false, 'name' => 'data[Batch][delete]', 'onclick' => "return confirm('".__('Are you sure you want to delete the selected records?')."');"));
 		return $output;
 	}
 	
@@ -248,7 +248,7 @@ class BatchHelper extends Helper {
 				$options += array('type' => 'text');
 			break;
 			case 'boolean':
-				$options += array('options' => array(true => __('Yes', true), false => __('No', true)));
+				$options += array('options' => array(true => __('Yes'), false => __('No')));
 			break;
 		}
 		$output = $this->Form->input($options['group'] . '.' . $model . '.' . $field, array_merge($defaults, $options));
