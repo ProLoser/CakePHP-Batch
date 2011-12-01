@@ -7,7 +7,8 @@
  * @package default
  * @author Dean
  */
-class BatchHelper extends Helper {
+App::uses('AppHelper', 'View/Helper');
+class BatchHelper extends AppHelper {
 	var $helpers = array('Form');
 	var $model = '';
 	private $_settings = array();

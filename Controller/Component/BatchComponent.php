@@ -132,10 +132,10 @@ class BatchComponent extends Component {
 			$this->_processBatch($this->controller);
 
 			foreach ($this->settings['url'] as $key => $value) {
-				$this->controller->params['named'][$key] = $value;
+				$this->controller->request->params['named'][$key] = $value;
 			}
 			$this->_filterOptions = array('url' => array_diff(
-				$this->controller->params['named'],
+				$this->controller->request->params['named'],
 				array('page' => 1, 'limit' => 20, 'sort' => 'val')
 			));
 
@@ -188,8 +188,8 @@ class BatchComponent extends Component {
 				unset($this->_data['Batch']['update']);
 				$this->_batchUpdate($rows);
 			}
-			unset($this->controller->data['Batch']);
-			unset($this->controller->data['BatchRecords']);
+			unset($this->controller->request->data['Batch']);
+			unset($this->controller->request->data['BatchRecords']);
 		}
 	}
 	
@@ -381,7 +381,7 @@ class BatchComponent extends Component {
 				}
 			}
 
-			App::import('Sanitize');
+			App::uses('Sanitize', 'Utility');
 			$sanitize = new Sanitize();
 			$this->_data['Filter'] = $sanitize->clean($this->_data['Filter'], array('encode' => false));
 		}
@@ -398,22 +398,22 @@ class BatchComponent extends Component {
  * @access private
  */
 	function _checkParams(&$controller) {
-		if (empty($controller->params['named'])) {
+		if (empty($controller->request->params['named'])) {
 			$filter = array();
 		}
 
-		App::import('Sanitize');
+		App::uses('Sanitize', 'Utility');
 		$sanitize = new Sanitize();
 
-		$controller->params['named'] = $sanitize->clean($controller->params['named'], array('encode' => false));
-		if (isset($controller->params['named']['Filter.parsed'])) {
-			if ($controller->params['named']['Filter.parsed']) {
+		$controller->request->params['named'] = $sanitize->clean($controller->request->params['named'], array('encode' => false));
+		if (isset($controller->request->params['named']['Filter.parsed'])) {
+			if ($controller->request->params['named']['Filter.parsed']) {
 				$this->settings['parsed'] = true;
 				$filter = array();
 			}
 		}
 
-		foreach ($controller->params['named'] as $field => $value) {
+		foreach ($controller->request->params['named'] as $field => $value) {
 			if (!in_array($field, $this->settings['paginatorParams']) && $field != 'Filter.parsed') {
 				$fields = explode('.', $field);
 				if (sizeof($fields) == 1) {
