@@ -20,8 +20,7 @@ $(document).ready(function(){
 	            $el.closest('tr').removeClass('checked');
 	        }
 		}
-    });
-    $('input.batch-all').live('click', function(){
+    }).delegate('input.batch-all', 'click', function(event){
         if ($(this).is(':checked')) {
             $('form.batch input.batch').attr('checked','checked').closest('tr').addClass('checked');
         } else {
