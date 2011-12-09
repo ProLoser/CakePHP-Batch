@@ -3,7 +3,9 @@
  * Batch component
  *
  */
-class BatchComponent extends Object {
+
+App::uses('Sanitize', 'Utility');
+class BatchComponent extends Component {
 
 /**
  * Default Component::$params
@@ -23,7 +25,7 @@ class BatchComponent extends Object {
  * 
  * @var array
  */
-	var $settings = array(
+	var $defaults = array(
 		'actions' => array('index'),
 		'defaults' => array(),
 		'fieldFormatting' => array(
@@ -55,14 +57,14 @@ class BatchComponent extends Object {
  *
  * @var array
  */
-	var $paginate = array('conditions' => array());
+	public $paginate = array('conditions' => array());
 
 /**
  * Holds filterOptions for 1.2 Compatibility
  *
  * @var array
  **/
-	var $_filterOptions = array();
+	protected $filterOptions = array();
 
 /**
  * Stores data for the current pagination set
@@ -70,36 +72,24 @@ class BatchComponent extends Object {
  * @var array
  * @access private
  **/
-	var $_data = array();
+	protected $data = array();
 	
-	var $controller;
+	protected $controller;
+	
+	public function shutdown() {}
+	
+	public function beforeRender() {}
+		
+	public function beforeRedirect() {}
 
 /**
- * Initializes FilterComponent for use in the controller
+ * Constructor
  *
- * @param object $controller A reference to the instantiating controller object
- * @param array $settings Array of settings for the Component
- * @return void
- * @access public
+ * @param ComponentCollection $collection A ComponentCollection this component can use to lazy load its components
+ * @param array $settings Array of configuration settings.
  */
-	function initialize(&$controller, $settings = array()) {
-		$this->settings['actions'] = (empty($settings['actions'])) ? $this->settings['actions'] : (array) $settings['actions'];
-		if (in_array($controller->action, $this->settings['actions'])) {
-			$this->controller = $controller;
-			$settings['whitelist'] = (empty($settings['whitelist'])) ? array() : (array) $settings['whitelist'];
-			$this->settings = array_merge($this->settings, $settings);
-			
-			// Fix for security component
-			if ($this->settings['security'] && in_array('Security', array_keys($controller->components), true)) {
-				$controller->Security->disabledFields = array_merge($controller->Security->disabledFields, array(
-					'Filter.filter', 
-					'Filter.reset',
-					'Filter.clear', 
-					'Batch.delete', 
-					'Batch.update',
-				));
-			}
-		}
+	public function __construct(ComponentCollection $collection, $settings = array()) {
+		$this->settings = array_merge($this->defaults, $settings);
 	}
 
 /**
@@ -109,45 +99,47 @@ class BatchComponent extends Object {
  * @return void
  * @author Dean Sofer
  */	
-	function startup(&$controller) {
-		if (in_array($controller->action, $this->settings['actions'])) {
-			$this->_processAction();
+	function startup($controller) {
+		if (in_array($controller->request->action, $this->settings['actions'])) {
+			$this->controller = $controller;
 			$controller->helpers[] = 'Batch.Batch';
-		}
-	}
-
-/**
- * 
- *
- * @param string $controller 
- * @return void
- * @author Dean Sofer
- */
-	function _processAction() {
-		$this->paginate = array_merge($this->paginate, $this->controller->paginate);
-		if (isset($this->controller->data['reset']) || isset($this->controller->data['cancel'])) {
-			$this->controller->redirect(array());
-		} else {
-			$this->_processFilters($this->controller);
-			$this->_processBatch($this->controller);
-
-			foreach ($this->settings['url'] as $key => $value) {
-				$this->controller->params['named'][$key] = $value;
+			// Fix for security component
+			if ($this->settings['security'] && in_array('Security', array_keys($controller->components), true)) {
+				$controller->Security->disabledFields = array_merge($controller->Security->disabledFields, array(
+					'Batch.filter',
+					'Batch.reset',
+					'Batch.clear',
+					'Batch.delete',
+					'Batch.update',
+				));
 			}
-			$this->_filterOptions = array('url' => array_diff(
-				$this->controller->params['named'],
-				array('page' => 1, 'limit' => 20, 'sort' => 'val')
-			));
+			$this->data = $controller->request->data;
+			$this->paginate = array_merge($this->paginate, $controller->paginate);
+			if (isset($this->data['Batch']['reset']) || isset($this->data['Batch']['cancel'])) {
+				$controller->redirect(array());
+			} else {
+				$this->_processFilters($controller);
+				$this->_processBatch();
 
-			$this->settings['formOptionsDatetime'] = array(
-				'dateFormat' => 'DMY',
-				'empty' => '-',
-				'maxYear' => date("Y"),
-				'minYear' => date("Y")-2,
-				'type' => 'date'
-			);	
+				foreach ($this->settings['url'] as $key => $value) {
+					$controller->request->params['named'][$key] = $value;
+				}
+				$this->filterOptions = array('url' => array_diff(
+					$controller->request->params['named'],
+					array('page' => 1, 'limit' => 20, 'sort' => 'val')
+				));
+
+				$this->settings['formOptionsDatetime'] = array(
+					'dateFormat' => 'DMY',
+					'empty' => '-',
+					'maxYear' => date("Y"),
+					'minYear' => date("Y")-2,
+					'type' => 'date'
+				);	
+			}
+			$this->controller->paginate = $this->paginate;
+			
 		}
-		$this->controller->paginate = $this->paginate;
 	}
 
 /**
@@ -173,36 +165,35 @@ class BatchComponent extends Object {
 /**
  * undocumented function
  *
- * @param string $controller 
  * @return void
  * @author Dean Sofer
  */
 	function _processBatch() {
-		if (isset($this->_data['Batch']) && isset($this->_data['BatchRecords'])) {
-			$rows = $this->_data['BatchRecords'];
-			if (!$rows && (isset($this->_data['Batch']['delete']) || isset($this->_data['Batch']['update']))) {
-				$this->controller->Session->setFlash(__('No rows selected', true));
-			} elseif (isset($this->_data['Batch']['delete'])) {
+		if (isset($this->data['Batch']) && isset($this->data['BatchRecords'])) {
+			$rows = $this->data['BatchRecords'];
+			if (!$rows && (isset($this->data['Batch']['delete']) || isset($this->data['Batch']['update']))) {
+				$this->controller->Session->setFlash(__('No rows selected'));
+			} elseif (isset($this->data['Batch']['delete'])) {
 				$this->_batchDelete($rows);
-			} elseif (isset($this->_data['Batch']['update'])) {
-				unset($this->_data['Batch']['update']);
+			} elseif (isset($this->data['Batch']['update'])) {
+				unset($this->data['Batch']['update']);
 				$this->_batchUpdate($rows);
 			}
-			unset($this->controller->data['Batch']);
-			unset($this->controller->data['BatchRecords']);
+			unset($this->controller->request->data['Batch']);
+			unset($this->controller->request->data['BatchRecords']);
 		}
 	}
 	
 	function _batchDelete($rows) {
 		if ($this->controller->{$this->controller->modelClass}->deleteAll(array($this->controller->modelClass . '.id' => $rows), $this->settings['cascade'], $this->settings['callbacks'])) {
-			$this->controller->Session->setFlash(sprintf(__('%s record(s) successfully deleted', true), count($rows)));
+			$this->controller->Session->setFlash(sprintf(__('%s record(s) successfully deleted'), count($rows)));
 		} else {
-			$this->controller->Session->setFlash(__('There was an error attempting to delete the specified rows', true));
+			$this->controller->Session->setFlash(__('There was an error attempting to delete the specified rows'));
 		}
 	}
 	
 	function _batchUpdate($rows) {
-		$data = $this->_data['Batch'];
+		$data = $this->data['Batch'];
 		foreach ($data as $model => $fields) {
 			$fields = $this->_escapeFields($fields, $model);
 			if (isset($this->controller->{$model})) {
@@ -215,45 +206,44 @@ class BatchComponent extends Object {
 				$this->controller->{$this->controller->modelClass}->{$model}->updateAll($fields, array($model . '.' . $foreignId => $rows));
 			}
 		}
-		$this->controller->Session->setFlash(sprintf(__('%s record(s) successfully updated', true), count($rows)));
+		$this->controller->Session->setFlash(sprintf(__('%s record(s) successfully updated'), count($rows)));
 	}
 
 /**
- * Function which will change controller->data array
+ * Function which will change controller->request->data array
  * 
- * @param object $controller Reference to controller
  * @return void
  * @access public
  */
-	function _processFilters(&$controller) {
-		$this->_prepareFilter($controller);
+	function _processFilters() {
+		$this->_prepareFilter();
 
 		// Set default filter values
-		$this->_data['Filter'] = array_merge($this->settings['defaults'], $this->_data['Filter']);
+		$this->data['Filter'] = array_merge($this->settings['defaults'], $this->data['Filter']);
 		$redirectData = array();
 
-		if (isset($this->_data['Filter']['filter'])) {
-			foreach ($this->_data['Filter'] as $model => $fields) {
+		if (isset($this->data['Filter']['filter'])) {
+			foreach ($this->data['Filter'] as $model => $fields) {
 				$modelFieldNames = array();
-				if (isset($controller->{$model})) {
-					$modelFieldNames = $controller->{$model}->getColumnTypes();
-				} else if (isset($controller->{$controller->modelClass}->belongsTo[$model]) || isset($controller->{$controller->modelClass}->hasOne[$model])) {
-					$modelFieldNames = $controller->{$controller->modelClass}->{$model}->getColumnTypes();
+				if (isset($this->controller->{$model})) {
+					$modelFieldNames = $this->controller->{$model}->getColumnTypes();
+				} else if (isset($this->controller->{$this->controller->modelClass}->belongsTo[$model]) || isset($this->controller->{$this->controller->modelClass}->hasOne[$model])) {
+					$modelFieldNames = $this->controller->{$this->controller->modelClass}->{$model}->getColumnTypes();
 				}
 				if (!empty($modelFieldNames)) {
 					foreach ($fields as $filteredFieldName => $filteredFieldData) {
 						$this->_filterField($model, $filteredFieldName, $filteredFieldData, $modelFieldNames);
 					}
 				} else {
-					if (isset($controller->{$controller->modelClass}->hasMany[$model])) {
-						$modelFieldNames = $controller->{$controller->modelClass}->{$model}->getColumnTypes();
+					if (isset($this->controller->{$this->controller->modelClass}->hasMany[$model])) {
+						$modelFieldNames = $this->controller->{$this->controller->modelClass}->{$model}->getColumnTypes();
 						if (!empty($modelFieldNames)) {
 							foreach ($fields as $filteredFieldName => $filteredFieldData) {
 								$this->_filterField($model, $filteredFieldName, $filteredFieldData, $modelFieldNames);
 							}
 						}
-					} else if (isset($controller->{$controller->modelClass}->hasAndBelongsToMany[$model])) {
-						$modelFieldNames = $controller->{$controller->modelClass}->{$model}->getColumnTypes();
+					} else if (isset($this->controller->{$this->controller->modelClass}->hasAndBelongsToMany[$model])) {
+						$modelFieldNames = $this->controller->{$this->controller->modelClass}->{$model}->getColumnTypes();
 						if (!empty($modelFieldNames)) {
 							foreach ($fields as $filteredFieldName => $filteredFieldData) {
 								$this->_filterField($model, $filteredFieldName, $filteredFieldData, $modelFieldNames);
@@ -262,14 +252,14 @@ class BatchComponent extends Object {
 					}
 				}
 				// Save model data for redirect
-				if ($this->settings['redirect'] && is_array($this->_data['Filter'][$model])) {
-					foreach ($this->_data['Filter'][$model] as $key => $val) {
+				if ($this->settings['redirect'] && is_array($this->data['Filter'][$model])) {
+					foreach ($this->data['Filter'][$model] as $key => $val) {
 						$redirectData["$model.$key"] = $val;
 					}
 				}
 				// Unset empty model data
 				if (count($fields) == 0) {
-					unset($this->_data['Filter'][$model]);
+					unset($this->data['Filter'][$model]);
 				}
 			}
 		}
@@ -277,7 +267,7 @@ class BatchComponent extends Object {
 		// If redirect has been set true, and the data had not been parsed before and put into the url, does it now
 		if ($this->settings['parsed'] === false && $this->settings['redirect'] === true) {
 			$this->settings['url'] = "/Filter.parsed:true/{$this->_buildNamedParams($redirectData)}";
-			$controller->redirect("/{$controller->name}/index{$this->settings['url']}");
+			$this->controller->redirect("/{$this->controller->name}/index{$this->settings['url']}");
 		}
 	}
 
@@ -365,59 +355,56 @@ class BatchComponent extends Object {
 /**
  * Store sanitized version of filter data
  * 
- * @param object $controller Reference to controller
+ * @param object $this->controller Reference to controller
  * @access private
  */
-	function _prepareFilter(&$controller) {
-		if (isset($controller->data['Filter'])) {
-			$this->_data = $controller->data;
-			foreach ($this->_data['Filter'] as $model => $fields) {
+	function _prepareFilter() {
+		if (isset($this->controller->request->data['Batch'])) {
+			foreach ($this->data['Filter'] as $model => $fields) {
 				if (is_array($fields)) {
 					foreach ($fields as $key => $field) {
 						if ($field == '') {
-							unset($this->_data['Filter'][$model][$key]);
+							unset($this->data['Filter'][$model][$key]);
 						}
 					}
 				}
 			}
-
-			App::import('Sanitize');
 			$sanitize = new Sanitize();
-			$this->_data['Filter'] = $sanitize->clean($this->_data['Filter'], array('encode' => false));
+			$this->data['Filter'] = $sanitize->clean($this->data['Filter'], array('encode' => false));
 		}
-		if (empty($this->_data['Filter'])) {
-			$this->_data['Filter'] = $this->_checkParams($controller);
+		if (empty($this->data['Filter'])) {
+			$this->data['Filter'] = $this->_checkParams($this->controller);
 		}
 	}
 
 /**
  * Parses named parameters from the current GET request
  * 
- * @param object $controller Reference to controller
+ * @param object $this->controller Reference to controller
  * @return array Parsed params
  * @access private
  */
-	function _checkParams(&$controller) {
-		if (empty($controller->params['named'])) {
+	function _checkParams() {
+		if (empty($this->controller->request->params['named'])) {
 			$filter = array();
 		}
 
-		App::import('Sanitize');
+		App::uses('Sanitize', 'Utility');
 		$sanitize = new Sanitize();
 
-		$controller->params['named'] = $sanitize->clean($controller->params['named'], array('encode' => false));
-		if (isset($controller->params['named']['Filter.parsed'])) {
-			if ($controller->params['named']['Filter.parsed']) {
+		$this->controller->request->params['named'] = $sanitize->clean($this->controller->request->params['named'], array('encode' => false));
+		if (isset($this->controller->request->params['named']['Filter.parsed'])) {
+			if ($this->controller->request->params['named']['Filter.parsed']) {
 				$this->settings['parsed'] = true;
 				$filter = array();
 			}
 		}
 
-		foreach ($controller->params['named'] as $field => $value) {
+		foreach ($this->controller->request->params['named'] as $field => $value) {
 			if (!in_array($field, $this->settings['paginatorParams']) && $field != 'Filter.parsed') {
 				$fields = explode('.', $field);
 				if (sizeof($fields) == 1) {
-					$filter[$controller->modelClass][$field] = $value;
+					$filter[$this->controller->modelClass][$field] = $value;
 				} else {
 					$filter[$fields[0]][$fields[1]] = $value;
 				}
@@ -464,7 +451,7 @@ class BatchComponent extends Object {
 		if (count($array) != count($keys)) return false;
 
 		$array = array_keys($array);
-		foreach ($keys as &$key) {
+		foreach ($keys as $key) {
 			if (!in_array($key, $array)) {
 				return false;
 			}
