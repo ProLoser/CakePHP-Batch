@@ -2,7 +2,7 @@ h1. CakePHP Batch (and filter) Plugin
 
 Paginates Filtered Records and allows Batch deletion and updating of records
 
-!http://deansofer.com/uploads/original-CakePHP_Batch_Plugin.jpg!
+!http://deansofer.com/uploads/media/original-CakePHP_Batch_Plugin.jpg!
 
 h2. Background
 
