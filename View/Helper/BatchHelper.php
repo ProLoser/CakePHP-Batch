@@ -26,8 +26,7 @@ class BatchHelper extends Helper {
 		if (!isset($params['class']))
 			$params['class'] = 'batch';
 		
-		$params['url'] = '/' . (isset($this->params['url']['url'])?$this->params['url']['url']:$this->params['url']);
-		
+		$params['url'] = '/' . (isset($this->params['url']['url'])?$this->params['url']['url']:$this->request->url);
 		$params['inputDefaults'] = array_merge(array(
 			'empty' => __(' -- '),
 			'div' => false,
