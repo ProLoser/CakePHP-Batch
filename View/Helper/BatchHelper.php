@@ -7,9 +7,28 @@
  * @package default
  * @author Dean
  */
-class BatchHelper extends Helper {
+App::uses('AppHelper', 'View/Helper');
+class BatchHelper extends AppHelper {
 	var $helpers = array('Form');
 	var $model = '';
+	private $_settings = array();
+	protected $_View = null;
+	/**
+	* Constructor
+	*
+	* Takes options to configure instance variables like publisher
+	*
+	* ### Options
+	*
+	* - `publisher` (string) Publisher key from [ShareThis](http://sharethis.com)
+	*
+	* @param array $options
+	*/
+	public function __construct(View $View, $settings = array()) {
+		parent::__construct($View, $settings);
+		$this->_View = $View;
+		$this->_settings = array_merge($this->_settings, $settings);
+	}
 
 /**
  * Starts a new form with modifications necessary for the batch plugin. 
@@ -25,8 +44,7 @@ class BatchHelper extends Helper {
 		$this->model = $model;
 		if (!isset($params['class']))
 			$params['class'] = 'batch';
-		
-		$params['url'] = '/' . (isset($this->params['url']['url'])?$this->params['url']['url']:$this->request->url);
+		$params['url'] = '/' . $this->_View->request->url;
 		$params['inputDefaults'] = array_merge(array(
 			'empty' => __(' -- '),
 			'div' => false,
@@ -117,8 +135,8 @@ class BatchHelper extends Helper {
 	 * @author Dean Sofer
 	 */
 	function filterButtons() {
-		$output = $this->Form->submit(__('Filter'), array('div' => false, 'name' => 'data[Batch][filter]'));
-		$output .= $this->Form->submit(__('Reset'), array('div' => false, 'name' => 'data[Batch][reset]'));
+		$output = $this->Form->submit(__('Filter'), array('div' => false, 'name' => 'data[Filter][filter]'));
+		$output .= $this->Form->submit(__('Reset'), array('div' => false, 'name' => 'data[Filter][reset]'));
 		return $output;
 	}
 

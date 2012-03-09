@@ -3,8 +3,6 @@
  * Batch component
  *
  */
-
-App::uses('Sanitize', 'Utility');
 class BatchComponent extends Component {
 
 /**
@@ -128,17 +126,23 @@ class BatchComponent extends Component {
 					$controller->request->params['named'],
 					array('page' => 1, 'limit' => 20, 'sort' => 'val')
 				));
-
-				$this->settings['formOptionsDatetime'] = array(
-					'dateFormat' => 'DMY',
-					'empty' => '-',
-					'maxYear' => date("Y"),
-					'minYear' => date("Y")-2,
-					'type' => 'date'
-				);	
 			}
-			$this->controller->paginate = $this->paginate;
-			
+			foreach ($this->settings['url'] as $key => $value) {
+				$this->controller->request->params['named'][$key] = $value;
+			}
+			$this->_filterOptions = array('url' => array_diff(
+				$this->controller->request->params['named'],
+				array('page' => 1, 'limit' => 20, 'sort' => 'val')
+			));
+
+			$this->settings['formOptionsDatetime'] = array(
+				'dateFormat' => 'DMY',
+				'empty' => '-',
+				'maxYear' => date("Y"),
+				'minYear' => date("Y")-2,
+				'type' => 'date'
+			);
+			$this->controller->paginate = $this->paginate;	
 		}
 	}
 
@@ -169,11 +173,11 @@ class BatchComponent extends Component {
  * @author Dean Sofer
  */
 	function _processBatch() {
-		if (isset($this->data['Batch']) && isset($this->data['BatchRecords'])) {
-			$rows = $this->data['BatchRecords'];
-			if (!$rows && (isset($this->data['Batch']['delete']) || isset($this->data['Batch']['update']))) {
+		if (isset($this->_data['Batch']) && isset($this->_data['BatchRecords'])) {
+			$rows = $this->_data['BatchRecords'];
+			if (!$rows && (isset($this->_data['Batch']['delete']) || isset($this->_data['Batch']['update']))) {
 				$this->controller->Session->setFlash(__('No rows selected'));
-			} elseif (isset($this->data['Batch']['delete'])) {
+			} elseif (isset($this->_data['Batch']['delete'])) {
 				$this->_batchDelete($rows);
 			} elseif (isset($this->data['Batch']['update'])) {
 				unset($this->data['Batch']['update']);
@@ -369,6 +373,7 @@ class BatchComponent extends Component {
 					}
 				}
 			}
+			App::uses('Sanitize', 'Utility');
 			$sanitize = new Sanitize();
 			$this->data['Filter'] = $sanitize->clean($this->data['Filter'], array('encode' => false));
 		}
@@ -384,23 +389,23 @@ class BatchComponent extends Component {
  * @return array Parsed params
  * @access private
  */
-	function _checkParams() {
-		if (empty($this->controller->request->params['named'])) {
+	function _checkParams(&$controller) {
+		if (empty($controller->request->params['named'])) {
 			$filter = array();
 		}
 
 		App::uses('Sanitize', 'Utility');
 		$sanitize = new Sanitize();
 
-		$this->controller->request->params['named'] = $sanitize->clean($this->controller->request->params['named'], array('encode' => false));
-		if (isset($this->controller->request->params['named']['Filter.parsed'])) {
-			if ($this->controller->request->params['named']['Filter.parsed']) {
+		$controller->request->params['named'] = $sanitize->clean($controller->request->params['named'], array('encode' => false));
+		if (isset($controller->request->params['named']['Filter.parsed'])) {
+			if ($controller->request->params['named']['Filter.parsed']) {
 				$this->settings['parsed'] = true;
 				$filter = array();
 			}
 		}
 
-		foreach ($this->controller->request->params['named'] as $field => $value) {
+		foreach ($controller->request->params['named'] as $field => $value) {
 			if (!in_array($field, $this->settings['paginatorParams']) && $field != 'Filter.parsed') {
 				$fields = explode('.', $field);
 				if (sizeof($fields) == 1) {
