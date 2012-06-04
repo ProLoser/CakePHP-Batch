@@ -22,7 +22,7 @@ class BatchComponent extends Component {
  * rangeSeparator:		Separator to use between dates in a date range
  * url:					Url variable used in paginate helper (array('url'=>$url));
  * whitelist:			Array of fields and models for which this component may filter
- * 
+ *
  * @var array
  */
 	var $defaults = array(
@@ -73,13 +73,13 @@ class BatchComponent extends Component {
  * @access private
  **/
 	protected $data = array();
-	
+
 	protected $controller;
-	
+
 	public function shutdown() {}
-	
+
 	public function beforeRender() {}
-		
+
 	public function beforeRedirect() {}
 
 /**
@@ -95,10 +95,10 @@ class BatchComponent extends Component {
 /**
  * Startup callback
  *
- * @param string $controller 
+ * @param string $controller
  * @return void
  * @author Dean Sofer
- */	
+ */
 	function startup($controller) {
 		if (in_array($controller->request->action, $this->settings['actions'])) {
 			$this->controller = $controller;
@@ -115,10 +115,11 @@ class BatchComponent extends Component {
 			}
 			$this->data = $controller->request->data;
 			$this->paginate = array_merge($this->paginate, $controller->paginate);
-			if (isset($this->data['Batch']['reset']) || isset($this->data['Batch']['cancel'])) {
-				$controller->redirect(array());
+			if (isset($this->data['Filter']['reset']) || isset($this->data['Filter']['cancel'])) {
+				$controller->request->data = array();
 			} else {
-				$this->_processFilters($controller);
+				$this->_prepareFilters();
+				$this->_processFilters();
 				$this->_processBatch();
 
 				foreach ($this->settings['url'] as $key => $value) {
@@ -135,16 +136,16 @@ class BatchComponent extends Component {
 					'maxYear' => date("Y"),
 					'minYear' => date("Y")-2,
 					'type' => 'date'
-				);	
+				);
 			}
 			$this->controller->paginate = $this->paginate;
-			
+
 		}
 	}
 
 /**
  * Builds up a selected datetime for the form helper
- * 
+ *
  * @param string $fieldname the name of the field to process
  * @return null|string
  */
@@ -161,7 +162,7 @@ class BatchComponent extends Component {
 		}
 		return $datetime;
 	}
-	
+
 /**
  * undocumented function
  *
@@ -183,7 +184,7 @@ class BatchComponent extends Component {
 			unset($this->controller->request->data['BatchRecords']);
 		}
 	}
-	
+
 	function _batchDelete($rows) {
 		if ($this->controller->{$this->controller->modelClass}->deleteAll(array($this->controller->modelClass . '.id' => $rows), $this->settings['cascade'], $this->settings['callbacks'])) {
 			$this->controller->Session->setFlash(sprintf(__('%s record(s) successfully deleted'), count($rows)));
@@ -191,7 +192,7 @@ class BatchComponent extends Component {
 			$this->controller->Session->setFlash(__('There was an error attempting to delete the specified rows'));
 		}
 	}
-	
+
 	function _batchUpdate($rows) {
 		$data = $this->data['Batch'];
 		foreach ($data as $model => $fields) {
@@ -211,17 +212,15 @@ class BatchComponent extends Component {
 
 /**
  * Function which will change controller->request->data array
- * 
+ *
  * @return void
  * @access public
  */
 	function _processFilters() {
-		$this->_prepareFilter();
 
 		// Set default filter values
 		$this->data['Filter'] = array_merge($this->settings['defaults'], $this->data['Filter']);
 		$redirectData = array();
-
 		if (isset($this->data['Filter']['filter'])) {
 			foreach ($this->data['Filter'] as $model => $fields) {
 				$modelFieldNames = array();
@@ -354,11 +353,11 @@ class BatchComponent extends Component {
 
 /**
  * Store sanitized version of filter data
- * 
+ *
  * @param object $this->controller Reference to controller
  * @access private
  */
-	function _prepareFilter() {
+	function _prepareFilters() {
 		if (isset($this->controller->request->data['Batch'])) {
 			foreach ($this->data['Filter'] as $model => $fields) {
 				if (is_array($fields)) {
@@ -379,7 +378,7 @@ class BatchComponent extends Component {
 
 /**
  * Parses named parameters from the current GET request
- * 
+ *
  * @param object $this->controller Reference to controller
  * @return array Parsed params
  * @access private
@@ -410,7 +409,7 @@ class BatchComponent extends Component {
 				}
 			}
 		}
-		
+
 		if (!empty($filter)) {
 			$filter['filter'] = true;
 			return $filter;
@@ -421,7 +420,7 @@ class BatchComponent extends Component {
 
 /**
  * Prepares a date array for a MySQL WHERE clause
- * 
+ *
  * @param array $date
  * @return string
  * @access private
@@ -458,11 +457,11 @@ class BatchComponent extends Component {
 		}
 		return true;
 	}
-	
+
 /**
  * Escapes all the values of the fields and properly sets them up into a updateAll friendly array
  *
- * @param array $fields 
+ * @param array $fields
  * @return array $fields
  * @author Dean Sofer
  */

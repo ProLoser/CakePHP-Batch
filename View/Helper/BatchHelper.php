@@ -12,12 +12,12 @@ class BatchHelper extends Helper {
 	var $model = '';
 
 /**
- * Starts a new form with modifications necessary for the batch plugin. 
+ * Starts a new form with modifications necessary for the batch plugin.
  * Supports both filter and batch functions so that it can wrap an entire table.
  *
- * @param string $model 
- * @param string $params 
- * @param string $inputDefaults 
+ * @param string $model
+ * @param string $params
+ * @param string $inputDefaults
  * @return void
  * @author Dean Sofer
  */
@@ -25,8 +25,8 @@ class BatchHelper extends Helper {
 		$this->model = $model;
 		if (!isset($params['class']))
 			$params['class'] = 'batch';
-		$params['url'] = '/' . $this->params['url']['url'];
-		
+		$params['url'] = $this->here;
+
 		$params['inputDefaults'] = array_merge(array(
 			'empty' => __(' -- '),
 			'div' => false,
@@ -48,8 +48,8 @@ class BatchHelper extends Helper {
 	/**
 	 * Generates a filters form
 	 *
-	 * @param string $model 
-	 * @param string $fields 
+	 * @param string $model
+	 * @param string $fields
 	 * @return void
 	 * @author Dean
 	 */
@@ -68,7 +68,7 @@ class BatchHelper extends Helper {
 		$output .= $this->Form->end();
 		return $output;
 	}
-	
+
 	/**
 	 * Generates a filtering row for use in a paginated table
 	 *
@@ -76,7 +76,7 @@ class BatchHelper extends Helper {
 	 * Pass true to force the filter/reset buttons to appear somewhere other than the end
 	 * Example: $this->Batch->filter(array(null, 'name', 'date' => array('minYear' => 2000)))
 	 *
-	 * @param string $fields 
+	 * @param string $fields
 	 * @return void
 	 * @author Dean
 	 */
@@ -109,7 +109,7 @@ class BatchHelper extends Helper {
 		$output .= '</tr>';
 		return $output;
 	}
-	
+
 	/**
 	 * Small helper function for filter method
 	 *
@@ -117,8 +117,8 @@ class BatchHelper extends Helper {
 	 * @author Dean Sofer
 	 */
 	function filterButtons() {
-		$output = $this->Form->submit(__('Filter'), array('div' => false, 'name' => 'data[Batch][filter]'));
-		$output .= $this->Form->submit(__('Reset'), array('div' => false, 'name' => 'data[Batch][reset]'));
+		$output = $this->Form->submit(__('Filter'), array('div' => false, 'name' => 'data[Filter][filter]'));
+		$output .= $this->Form->submit(__('Reset'), array('div' => false, 'name' => 'data[Filter][reset]'));
 		return $output;
 	}
 
@@ -129,16 +129,16 @@ class BatchHelper extends Helper {
 	 * Pass true to force the filter/reset buttons to appear somewhere other than the end
 	 * Example: $this->Batch->filter(array(null, 'name', 'date' => array('minYear' => 2000)))
 	 *
-	 * @param string $fields 
+	 * @param string $fields
 	 * @return void
 	 * @author Dean
 	 */
 	function batch($fields = array(), $options = array()) {
 		$options = array_merge(array(
 		), $options);
-		
+
 		$output = '<tr class="batch">';
-		
+
 		if (!empty($fields)) {
 			foreach ($fields as $field => $attributes) {
 				if (is_int($field)) {
@@ -170,7 +170,7 @@ class BatchHelper extends Helper {
 		$output .= '</tr>';
 		return $output;
 	}
-	
+
 	/**
 	 * Small helper function for batch method
 	 *
@@ -182,11 +182,11 @@ class BatchHelper extends Helper {
 		$output .= $this->Form->submit(__('Delete'), array('div' => false, 'name' => 'data[Batch][delete]', 'onclick' => "return confirm('".__('Are you sure you want to delete the selected records?')."');"));
 		return $output;
 	}
-	
+
 	/**
 	 * Generates a checkbox used for batch actions for the current row of items
 	 *
-	 * @param string $recordId 
+	 * @param string $recordId
 	 * @return string
 	 * @author Dean Sofer
 	 */
@@ -195,7 +195,7 @@ class BatchHelper extends Helper {
 		$params = array('value' => $recordId, 'hiddenField' => false, 'class' => 'batch');
 		return $this->Form->checkbox($field, $params);
 	}
-	
+
 	/**
 	 * Generates a checkbox used only for toggling all batch checkboxes at once
 	 *
@@ -204,22 +204,22 @@ class BatchHelper extends Helper {
 	 */
 	function all($options = array()) {
 		$options = array_merge(array(
-			'value' => false, 
+			'value' => false,
 			'id' => false,
 			'name' => false,
-			'hiddenField' => false, 
+			'hiddenField' => false,
 			'class' => 'batch-all'
 		), $options);
 		return $this->Form->checkbox('', $options);
 	}
-	
+
 	/**
 	 * Generates a form input, allowing default options to be passed and handling cake versions separately
 	 *
-	 * @param string $model 
-	 * @param string $field 
-	 * @param array $options 
-	 * @param array $defaults 
+	 * @param string $model
+	 * @param string $field
+	 * @param array $options
+	 * @param array $defaults
 	 * @return string $output
 	 * @author Dean
 	 */
@@ -232,7 +232,7 @@ class BatchHelper extends Helper {
 			$model = $this->model;
 		}
 		switch ($this->_fieldType($model, $field)) {
-			case 'text':			
+			case 'text':
 				$options += array('type' => 'text');
 			break;
 			case 'boolean':
@@ -242,12 +242,12 @@ class BatchHelper extends Helper {
 		$output = $this->Form->input($options['group'] . '.' . $model . '.' . $field, array_merge($defaults, $options));
 		return $output;
 	}
-	
+
 	/**
 	 * Returns the field datatype based on the model schema
 	 *
-	 * @param string $model 
-	 * @param string $field 
+	 * @param string $model
+	 * @param string $field
 	 * @return string $type
 	 * @author Dean
 	 */
