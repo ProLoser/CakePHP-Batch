@@ -239,7 +239,9 @@ class BatchHelper extends Helper {
 				$options += array('options' => array(true => __('Yes'), false => __('No')));
 			break;
 		}
-		$output = $this->Form->input($options['group'] . '.' . $model . '.' . $field, array_merge($defaults, $options));
+		$group = $options['group'];
+		unset($options['group']);
+		$output = $this->Form->input($group . '.' . $model . '.' . $field, array_merge($defaults, $options));
 		return $output;
 	}
 

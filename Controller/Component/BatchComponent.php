@@ -76,11 +76,11 @@ class BatchComponent extends Component {
 
 	protected $controller;
 
-	public function shutdown() {}
+	public function shutdown(Controller $controller) {}
 
-	public function beforeRender() {}
+	public function beforeRender(Controller $controller) {}
 
-	public function beforeRedirect() {}
+	public function beforeRedirect(Controller $controller, $url, $status = null, $exit = true) {}
 
 /**
  * Constructor
@@ -99,7 +99,7 @@ class BatchComponent extends Component {
  * @return void
  * @author Dean Sofer
  */
-	function startup($controller) {
+	function startup(Controller $controller) {
 		if (in_array($controller->request->action, $this->settings['actions'])) {
 			$this->controller = $controller;
 			$controller->helpers[] = 'Batch.Batch';
