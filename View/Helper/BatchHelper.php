@@ -232,6 +232,7 @@ class BatchHelper extends Helper {
 			$model = $this->model;
 		}
 		switch ($this->_fieldType($model, $field)) {
+			case 'string':
 			case 'text':
 				$options += array('type' => 'text');
 			break;
