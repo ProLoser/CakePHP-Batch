@@ -25,7 +25,7 @@ class BatchComponent extends Component {
  *
  * @var array
  */
-	var $defaults = array(
+	public $defaults = array(
 		'actions' => array('index'),
 		'defaults' => array(),
 		'fieldFormatting' => array(
@@ -64,7 +64,7 @@ class BatchComponent extends Component {
  *
  * @var array
  **/
-	protected $filterOptions = array();
+	public $filterOptions = array();
 
 /**
  * Stores data for the current pagination set
@@ -72,15 +72,18 @@ class BatchComponent extends Component {
  * @var array
  * @access private
  **/
-	protected $data = array();
+	public $data = array();
 
-	protected $controller;
+	public $controller;
 
-	public function shutdown(Controller $controller) {}
+	public function shutdown(Controller $controller) {
+	}
 
-	public function beforeRender(Controller $controller) {}
+	public function beforeRender(Controller $controller) {
+	}
 
-	public function beforeRedirect(Controller $controller, $url, $status = null, $exit = true) {}
+	public function beforeRedirect(Controller $controller, $url, $status = null, $exit = true) {
+	}
 
 /**
  * Constructor
@@ -99,7 +102,7 @@ class BatchComponent extends Component {
  * @return void
  * @author Dean Sofer
  */
-	function startup(Controller $controller) {
+	public function startup(Controller $controller) {
 		if (in_array($controller->request->action, $this->settings['actions'])) {
 			$this->controller = $controller;
 			$controller->helpers[] = 'Batch.Batch';
@@ -134,7 +137,7 @@ class BatchComponent extends Component {
 					'dateFormat' => 'DMY',
 					'empty' => '-',
 					'maxYear' => date("Y"),
-					'minYear' => date("Y")-2,
+					'minYear' => date("Y") - 2,
 					'type' => 'date'
 				);
 			}
@@ -149,7 +152,7 @@ class BatchComponent extends Component {
  * @param string $fieldname the name of the field to process
  * @return null|string
  */
-	function _processDatetime($fieldname) {
+	protected function _processDatetime($fieldname) {
 		if (isset($this->params['named'][$fieldname])) {
 			$exploded = explode('-', $this->params['named'][$fieldname]);
 			if (!empty($exploded)) {
@@ -169,7 +172,7 @@ class BatchComponent extends Component {
  * @return void
  * @author Dean Sofer
  */
-	function _processBatch() {
+	protected function _processBatch() {
 		if (isset($this->data['Batch']) && isset($this->data['BatchRecords'])) {
 			$rows = $this->data['BatchRecords'];
 			if (!$rows && (isset($this->data['Batch']['delete']) || isset($this->data['Batch']['update']))) {
@@ -185,7 +188,7 @@ class BatchComponent extends Component {
 		}
 	}
 
-	function _batchDelete($rows) {
+	protected function _batchDelete($rows) {
 		if ($this->controller->{$this->controller->modelClass}->deleteAll(array($this->controller->modelClass . '.id' => $rows), $this->settings['cascade'], $this->settings['callbacks'])) {
 			$this->controller->Session->setFlash(sprintf(__('%s record(s) successfully deleted'), count($rows)));
 		} else {
@@ -193,7 +196,7 @@ class BatchComponent extends Component {
 		}
 	}
 
-	function _batchUpdate($rows) {
+	protected function _batchUpdate($rows) {
 		$data = $this->data['Batch'];
 		foreach ($data as $model => $fields) {
 			$fields = $this->_escapeFields($fields, $model);
@@ -216,8 +219,7 @@ class BatchComponent extends Component {
  * @return void
  * @access public
  */
-	function _processFilters() {
-
+	protected function _processFilters() {
 		// Set default filter values
 		$this->data['Filter'] = array_merge($this->settings['defaults'], $this->data['Filter']);
 		$redirectData = array();
@@ -278,7 +280,7 @@ class BatchComponent extends Component {
  * @access private
  * @author Chad Jablonski
  **/
-	function _buildNamedParams($params) {
+	protected function _buildNamedParams($params) {
 		$paramString = '';
 
 		foreach ($params as $key => $value) {
@@ -288,7 +290,6 @@ class BatchComponent extends Component {
 
 		return $paramString;
 	}
-
 
 /**
  * Filters an individual field
@@ -301,7 +302,7 @@ class BatchComponent extends Component {
  * @access private
  * @author Jose Diaz-Gonzalez
  **/
-	function _filterField($model, $filteredFieldName, $filteredFieldData, $modelFieldNames = array()) {
+	protected function _filterField($model, $filteredFieldName, $filteredFieldData, $modelFieldNames = array()) {
 		if (is_array($filteredFieldData)) {
 			if (!isset($modelFieldNames[$filteredFieldName])) {
 				if ($this->_arrayHasKeys($filteredFieldData, array('year', 'month', 'day'))) {
@@ -357,7 +358,7 @@ class BatchComponent extends Component {
  * @param object $this->controller Reference to controller
  * @access private
  */
-	function _prepareFilters() {
+	protected function _prepareFilters() {
 		if (isset($this->controller->request->data['Batch'])) {
 			foreach ($this->data['Filter'] as $model => $fields) {
 				if (is_array($fields)) {
@@ -383,7 +384,7 @@ class BatchComponent extends Component {
  * @return array Parsed params
  * @access private
  */
-	function _checkParams() {
+	protected function _checkParams() {
 		if (empty($this->controller->request->params['named'])) {
 			$filter = array();
 		}
@@ -402,7 +403,8 @@ class BatchComponent extends Component {
 		foreach ($this->controller->request->params['named'] as $field => $value) {
 			if (!in_array($field, $this->settings['paginatorParams']) && $field != 'Filter.parsed') {
 				$fields = explode('.', $field);
-				if (sizeof($fields) == 1) {
+				//sizeof($fields)
+				if (count($fields) == 1) {
 					$filter[$this->controller->modelClass][$field] = $value;
 				} else {
 					$filter[$fields[0]][$fields[1]] = $value;
@@ -426,7 +428,8 @@ class BatchComponent extends Component {
  * @access private
  * @author Jeffrey Marvin
  */
-	function _prepareDatetime($date) {
+	protected function _prepareDatetime($date) {
+		//@codingStandardsIgnoreStart
 		if ($this->settings['useTime'] === true) {
 			return  "{$date['year']}-{$date['month']}-{$date['day']}"
 				. ' ' . (($date['meridian'] == 'pm' && $date['hour'] != 12) ? $date['hour'] + 12 : $date['hour'])
@@ -434,6 +437,7 @@ class BatchComponent extends Component {
 		} else {
 			return "{$date['year']}-{$date['month']}-{$date['day']}";
 		}
+		//@codingStandardsIgnoreEnd
 	}
 
 /**
@@ -446,7 +450,7 @@ class BatchComponent extends Component {
  * @access private
  * @author Jose Diaz-Gonzalez
  **/
-	function _arrayHasKeys($array, $keys, $size = null) {
+	protected function _arrayHasKeys($array, $keys, $size = null) {
 		if (count($array) != count($keys)) return false;
 
 		$array = array_keys($array);
@@ -465,7 +469,7 @@ class BatchComponent extends Component {
  * @return array $fields
  * @author Dean Sofer
  */
-	function _escapeFields($fields, $model) {
+	protected function _escapeFields($fields, $model) {
 		$dbo = $this->controller->{$model}->getDataSource();
 		foreach ($fields as $field => $value) {
 			$fields[$field] = $dbo->value($value, $field, false);
